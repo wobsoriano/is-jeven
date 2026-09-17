@@ -1,0 +1,37 @@
+{
+  "name": "is-jeven",
+  "version": "1.0.0",
+  "description": "Is it even? Ask Jev. AI-powered parity checks with zero dependencies.",
+  "type": "module",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    }
+  },
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test",
+    "typecheck": "tsc --noEmit --allowJs --checkJs --strict --target es2022 --module nodenext --types node index.js"
+  },
+  "keywords": [
+    "is-even",
+    "ai",
+    "jev",
+    "typesafe"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^26.6.1",
+    "typescript": "^7.0.2"
+  }
+}
