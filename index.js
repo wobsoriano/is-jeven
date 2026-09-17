@@ -6,8 +6,7 @@
  */
 export async function isEven(num, options = {}) {
   const { signal } = options;
-  const apiKey = options.apiKey ??
-    (typeof process !== "undefined" ? process.env.TYPESAFE_API_KEY : undefined);
+  const apiKey = options.apiKey ?? globalThis.process?.env?.TYPESAFE_API_KEY;
 
   if (!Number.isSafeInteger(num)) {
     throw new TypeError("Expected a safe integer.");

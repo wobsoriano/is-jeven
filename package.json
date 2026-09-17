@@ -28,8 +28,8 @@
     "jev",
     "typesafe"
   ],
-  "author": "",
-  "license": "ISC",
+  "author": "Robert Soriano",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^26.6.1",
     "typescript": "^7.0.2"
