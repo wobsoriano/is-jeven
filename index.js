@@ -1,5 +1,5 @@
 /**
- * Ask Jev whether a number is even. Yes, this makes an HTTP request.
+ * Ask Jev whether a number is even.
  * @param {number} num
  * @param {import('./index.js').IsEvenOptions} [options]
  * @returns {Promise<boolean>}

@@ -19,6 +19,7 @@
     "node": ">=18"
   },
   "scripts": {
+    "release": "bumpp",
     "test": "node --test",
     "typecheck": "tsc --noEmit --allowJs --checkJs --strict --target es2022 --module nodenext --types node index.js"
   },
@@ -32,6 +33,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^26.6.1",
+    "bumpp": "^12.3.0",
     "typescript": "^7.0.2"
   }
 }
