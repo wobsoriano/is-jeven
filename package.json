@@ -1,6 +1,6 @@
 {
   "name": "is-jeven",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Is it even? Ask Jev. AI-powered parity checks with zero dependencies.",
   "type": "module",
   "main": "index.js",
