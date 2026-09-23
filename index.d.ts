@@ -5,6 +5,8 @@ export interface IsEvenOptions {
   signal?: AbortSignal;
   /** Include the model's confidence and parity probabilities. Defaults to false. */
   includeProbabilities?: boolean;
+  /** Minimum confidence in the selected verdict, from 0 to 1 inclusive. Unset by default. */
+  minConfidence?: number;
 }
 
 export interface IsEvenResult {
@@ -16,10 +18,18 @@ export interface IsEvenResult {
   probabilities: { even: number; odd: number };
 }
 
+/** Thrown when the model's confidence is below options.minConfidence. */
+export declare class InsufficientConfidenceError extends Error {
+  confidence: number;
+  minConfidence: number;
+  constructor(confidence: number, minConfidence: number);
+}
+
 /**
  * Ask TypeSafe AI's Jev model whether a safe integer is even.
  * Returns the model's verdict, which can be wrong. Each call makes one request.
  * Rejects on invalid input, a missing API key, or an API/network failure.
+ * Rejects with InsufficientConfidenceError when the selected verdict is below minConfidence.
  */
 export declare function isEven(
   num: number,

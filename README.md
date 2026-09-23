@@ -28,6 +28,9 @@ console.log(await isEven(3)); // false (hopefully)
 - `options.signal`: an optional `AbortSignal` for cancellation or a timeout.
 - `options.includeProbabilities`: return an `IsEvenResult` with the verdict, confidence,
   and parity probabilities instead of a boolean. Defaults to `false`.
+- `options.minConfidence`: an optional minimum confidence from 0 to 1, inclusive.
+  Rejects with `InsufficientConfidenceError` when the model's confidence in its
+  selected verdict is below this value. Unset by default; equality is accepted.
 
 ### Probabilities
 
@@ -48,6 +51,30 @@ selected verdict and the probability of each answer. These are distinct fields;
 `confidence` is not necessarily the same as `probabilities.even`, especially when
 the verdict is odd. All scores are from 0 to 1 and are returned unchanged. Each
 call still makes one request, and the model can still be wrong.
+
+### Minimum confidence
+
+For critical workflows involving the number 2:
+
+```js
+import { isEven, InsufficientConfidenceError } from "is-jeven";
+
+try {
+  const result = await isEven(2, {
+    includeProbabilities: true,
+    minConfidence: 0.99,
+  });
+  console.log(result.even, result.probabilities);
+} catch (error) {
+  if (!(error instanceof InsufficientConfidenceError)) throw error;
+  console.log(error.confidence, error.minConfidence);
+}
+```
+
+`minConfidence` also works without `includeProbabilities`, keeping the boolean
+return type. It checks `confidence` for either verdict, so a confident odd verdict
+still returns `false`. An uncertain verdict rejects instead of being treated as
+odd. There are no automatic retries or local arithmetic fallbacks.
 
 This is a joke package FYI.
 

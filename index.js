@@ -5,7 +5,7 @@
  * @returns {Promise<boolean | import('./index.js').IsEvenResult>}
  */
 export async function isEven(num, options = {}) {
-  const { signal, includeProbabilities = false } = options;
+  const { signal, includeProbabilities = false, minConfidence } = options;
   const apiKey = options.apiKey ?? globalThis.process?.env?.TYPESAFE_API_KEY;
 
   if (!Number.isSafeInteger(num)) {
@@ -14,6 +14,10 @@ export async function isEven(num, options = {}) {
 
   if (typeof includeProbabilities !== "boolean") {
     throw new TypeError("Expected options.includeProbabilities to be a boolean.");
+  }
+
+  if (minConfidence !== undefined && !isProbability(minConfidence)) {
+    throw new TypeError("Expected options.minConfidence to be a finite number from 0 to 1.");
   }
 
   if (typeof apiKey !== "string" || !apiKey.trim()) {
@@ -53,11 +57,16 @@ export async function isEven(num, options = {}) {
 
   const even = answer.choice === "true";
 
-  if (!includeProbabilities) return even;
-
-  if (!isProbability(answer.confidence)) {
-    throw new Error("TypeSafe AI returned an invalid confidence score.");
+  if (includeProbabilities || minConfidence !== undefined) {
+    if (!isProbability(answer.confidence)) {
+      throw new Error("TypeSafe AI returned an invalid confidence score.");
+    }
+    if (minConfidence !== undefined && answer.confidence < minConfidence) {
+      throw new InsufficientConfidenceError(answer.confidence, minConfidence);
+    }
   }
+
+  if (!includeProbabilities) return even;
 
   const probabilities = answer.probabilities;
   if (!isProbability(probabilities?.true) || !isProbability(probabilities?.false)) {
@@ -74,4 +83,14 @@ export async function isEven(num, options = {}) {
 /** @param {unknown} value @returns {value is number} */
 function isProbability(value) {
   return typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= 1;
+}
+
+export class InsufficientConfidenceError extends Error {
+  /** @param {number} confidence @param {number} minConfidence */
+  constructor(confidence, minConfidence) {
+    super(`Jev's confidence (${confidence}) is below the required minimum (${minConfidence}).`);
+    this.name = "InsufficientConfidenceError";
+    this.confidence = confidence;
+    this.minConfidence = minConfidence;
+  }
 }
