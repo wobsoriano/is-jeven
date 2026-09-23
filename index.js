@@ -2,14 +2,18 @@
  * Ask Jev whether a number is even.
  * @param {number} num
  * @param {import('./index.js').IsEvenOptions} [options]
- * @returns {Promise<boolean>}
+ * @returns {Promise<boolean | import('./index.js').IsEvenResult>}
  */
 export async function isEven(num, options = {}) {
-  const { signal } = options;
+  const { signal, includeProbabilities = false } = options;
   const apiKey = options.apiKey ?? globalThis.process?.env?.TYPESAFE_API_KEY;
 
   if (!Number.isSafeInteger(num)) {
     throw new TypeError("Expected a safe integer.");
+  }
+
+  if (typeof includeProbabilities !== "boolean") {
+    throw new TypeError("Expected options.includeProbabilities to be a boolean.");
   }
 
   if (typeof apiKey !== "string" || !apiKey.trim()) {
@@ -47,5 +51,27 @@ export async function isEven(num, options = {}) {
     throw new Error("TypeSafe AI returned an invalid evenness verdict.");
   }
 
-  return answer.choice === "true";
+  const even = answer.choice === "true";
+
+  if (!includeProbabilities) return even;
+
+  if (!isProbability(answer.confidence)) {
+    throw new Error("TypeSafe AI returned an invalid confidence score.");
+  }
+
+  const probabilities = answer.probabilities;
+  if (!isProbability(probabilities?.true) || !isProbability(probabilities?.false)) {
+    throw new Error("TypeSafe AI returned invalid parity probabilities.");
+  }
+
+  return {
+    even,
+    confidence: answer.confidence,
+    probabilities: { even: probabilities.true, odd: probabilities.false },
+  };
+}
+
+/** @param {unknown} value @returns {value is number} */
+function isProbability(value) {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= 1;
 }

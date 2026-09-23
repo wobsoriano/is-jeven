@@ -20,7 +20,7 @@
   },
   "scripts": {
     "test": "node --test",
-    "typecheck": "tsc --noEmit --allowJs --checkJs --strict --target es2022 --module nodenext --types node index.js"
+    "typecheck": "tsc --noEmit --allowJs --checkJs --strict --target es2022 --module nodenext --types node index.js type-tests/index.ts"
   },
   "keywords": [
     "is-even",
